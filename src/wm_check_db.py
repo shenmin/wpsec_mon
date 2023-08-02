@@ -6,7 +6,7 @@ wpsec_mon
 @author: Created by Shen Min (https://nicrosoft.net) on 2023-08-01.
 """
 
-import traceback, time, os
+import traceback, time, os, socket
 import mysql.connector
 import wm_log, wm_config, wm_mail, wm_utils
 
@@ -26,6 +26,7 @@ def __should_send_mail():
 
 def main():
     mysql_conn = None
+    hostname = ""
 
     if wm_config.config().get_option("mysql_ssh"):
         from sshtunnel import SSHTunnelForwarder
@@ -35,6 +36,7 @@ def main():
             try:
                 ssh_tunnel.start()
                 mysql_conn = mysql.connector.connect(user=wm_config.config().get_option("mysql_user"), password=wm_config.config().get_option("mysql_password"), host=wm_config.config().get_option("mysql_host"), port=ssh_tunnel.local_bind_port, use_pure=True)
+                hostname = wm_config.config().get_option("mysql_ssh_host")
                 break
             except Exception as e:
                 wm_log.log().log_msg("Failed to connect to MySQL: %s" % e)
@@ -46,6 +48,7 @@ def main():
     else:
         try:
             mysql_conn = mysql.connector.connect(user=wm_config.config().get_option("mysql_user"), password=wm_config.config().get_option("mysql_password"), host=wm_config.config().get_option("mysql_host"))
+            hostname = socket.gethostname()
         except Exception as e:
             wm_log.log().log_msg("Failed to connect to MySQL: %s" % e)
 
@@ -79,7 +82,7 @@ def main():
 
     if len(result) > 0:
         if wm_config.config().get_option("send_email") and __should_send_mail():
-            wm_mail.send_alert_for_user_count(result)
+            wm_mail.send_alert_for_user_count(hostname, result)
 
             with open(sendmail_ts_file, "w") as f:
                 f.writelines(str(time.time()))

@@ -47,6 +47,9 @@ class wm_log:
                         fs = 0
 
     def log_msg(self, msg):
+        if not wm_config.config().get_option("debug"):
+            return
+
         f = codecs.open(self.__fileA, 'a', 'utf-8')
 
         succ = True

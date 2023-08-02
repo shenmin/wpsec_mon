@@ -20,7 +20,7 @@ A sample configuration file for running with MySQL locally:
             },
             "wp2": {
                 "root_path": "/home/web/wordpress2/public_html/",
-                "user_count": 0
+                "user_count": 1
             }
         },
         "debug": false,
@@ -50,7 +50,7 @@ or for connecting to MySQL with SSH:
             },
             "wp2": {
                 "root_path": "/home/web/wordpress2/public_html/",
-                "user_count": 0
+                "user_count": 1
             }
         },
         "debug": false,
